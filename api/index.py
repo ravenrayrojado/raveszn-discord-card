@@ -1,50 +1,410 @@
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
-import os
-import requests
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAVESZN CLUB!</title>
 
-app = FastAPI()
-
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_ID = "399904586824941568"
-
-
-@app.get("/")
-def home():
-    return FileResponse("index.html")
-
-
-@app.get("/api")
-def api_home():
-    return {
-        "status": "online",
-        "message": "RAVESZN Discord Card API is working."
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-
-@app.get("/api/stats")
-def stats():
-    headers = {
-        "Authorization": f"Bot {DISCORD_TOKEN}"
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(88, 101, 242, 0.25),
+          transparent 45%
+        ),
+        radial-gradient(
+          circle at bottom right,
+          rgba(145, 70, 255, 0.2),
+          transparent 45%
+        ),
+        #11131a;
     }
 
-    response = requests.get(
-        f"https://discord.com/api/v10/guilds/{GUILD_ID}?with_counts=true",
-        headers=headers,
-        timeout=10
-    )
+    .card {
+      position: relative;
+      width: min(100%, 680px);
+      min-height: 190px;
 
-    if response.status_code != 200:
-        return {
-            "status": "error",
-            "message": "Unable to get Discord server stats."
+      display: flex;
+      align-items: center;
+      gap: 24px;
+
+      padding: 30px;
+
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 28px;
+
+      background: rgba(255, 255, 255, 0.08);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+      color: white;
+    }
+
+    /* Discord label */
+
+    .discord-badge {
+      position: absolute;
+
+      top: 16px;
+      right: 18px;
+
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      padding: 6px 10px;
+
+      border-radius: 8px;
+
+      background: rgba(255, 255, 255, 0.08);
+
+      color: rgba(255, 255, 255, 0.78);
+
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .discord-badge svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Server icon */
+
+    .icon {
+      width: 120px;
+      height: 120px;
+
+      flex-shrink: 0;
+
+      border-radius: 26px;
+
+      object-fit: cover;
+
+      background: #24262d;
+
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Content */
+
+    .content {
+      flex: 1;
+      min-width: 0;
+
+      padding-top: 12px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+
+      font-size: clamp(26px, 5vw, 40px);
+
+      font-weight: 700;
+
+      letter-spacing: -1px;
+    }
+
+    /* Statistics */
+
+    .stats {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      gap: 9px;
+
+      margin-bottom: 18px;
+
+      color: rgba(255, 255, 255, 0.78);
+
+      font-size: 15px;
+
+      font-weight: 600;
+    }
+
+    .online {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .online-dot {
+      width: 11px;
+      height: 11px;
+
+      border-radius: 50%;
+
+      background: #23a559;
+
+      box-shadow:
+        0 0 10px rgba(35, 165, 89, 0.75);
+    }
+
+    .separator {
+      opacity: 0.45;
+    }
+
+    /* Join button */
+
+    .join {
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      min-width: 120px;
+
+      padding: 11px 26px;
+
+      border-radius: 12px;
+
+      background: #5865f2;
+
+      color: white;
+
+      text-decoration: none;
+
+      font-size: 16px;
+
+      font-weight: 700;
+
+      box-shadow:
+        0 7px 20px rgba(88, 101, 242, 0.35);
+
+      transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+    }
+
+    .join:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .join:active {
+      transform: translateY(0);
+    }
+
+    /* Mobile */
+
+    @media (max-width: 550px) {
+      .card {
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 28px 20px;
+      }
+
+      .discord-badge {
+        top: 12px;
+        right: 12px;
+      }
+
+      .icon {
+        width: 100px;
+        height: 100px;
+      }
+
+      .content {
+        padding-top: 0;
+      }
+
+      .stats {
+        justify-content: center;
+      }
+
+      .join {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <!-- Discord label -->
+    <div class="discord-badge">
+
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M19.54 5.1A16.1 16.1 0 0 0 15.5 3.86l-.5 1.02a14.6 14.6 0 0 0-6 0l-.5-1.02A16.1 16.1 0 0 0 4.46 5.1C1.92 8.9 1.23 12.6 1.56 16.25a16.2 16.2 0 0 0 4.96 2.52l1.2-1.63a9.8 9.8 0 0 1-1.88-.9l.46-.35c3.65 1.7 7.6 1.7 11.2 0l.46.35c-.6.36-1.23.66-1.88.9l1.2 1.63a16.2 16.2 0 0 0 4.96-2.52c.39-4.23-.66-7.9-2.7-11.15ZM8.45 14.24c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.12 0 2.02.99 2 2.2 0 1.21-.88 2.2-2 2.2Zm7.1 0c-1.1 0-2-.99-2-2.2s.88-2.2 2-2.2c1.12 0 2.02.99 2 2.2 0 1.21-.88 2.2-2 2.2Z"
+        />
+      </svg>
+
+      <span>DISCORD</span>
+
+    </div>
+
+
+    <!-- Server icon -->
+    <img
+      id="icon"
+      class="icon"
+      src=""
+      alt="RAVESZN CLUB! Server Icon"
+    >
+
+
+    <!-- Server information -->
+    <div class="content">
+
+      <h1 id="name">
+        RAVESZN CLUB!
+      </h1>
+
+
+      <!-- Live statistics -->
+      <div class="stats">
+
+        <span class="online">
+
+          <span class="online-dot"></span>
+
+          <span id="online">
+            --
+          </span>
+
+          ONLINE
+
+        </span>
+
+
+        <span class="separator">
+          •
+        </span>
+
+
+        <span>
+
+          👥
+
+          <span id="members">
+            --
+          </span>
+
+          MEMBERS
+
+        </span>
+
+      </div>
+
+
+      <!-- Join -->
+      <a
+        class="join"
+        href="https://discord.gg/TvyZ2VjQMg"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        JOIN
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    async function updateStats() {
+
+      try {
+
+        const response =
+          await fetch("/api/stats");
+
+        if (!response.ok) {
+          throw new Error("API request failed");
         }
 
-    data = response.json()
+        const data =
+          await response.json();
 
-    return {
-        "name": data.get("name"),
-        "icon": data.get("icon"),
-        "members": data.get("approximate_member_count", 0),
-        "online": data.get("approximate_presence_count", 0)
+
+        if (data.status === "error") {
+          return;
+        }
+
+
+        // Server name
+        document.getElementById("name")
+          .textContent =
+          data.name || "RAVESZN CLUB!";
+
+
+        // Online members
+        document.getElementById("online")
+          .textContent =
+          data.online ?? 0;
+
+
+        // Total members
+        document.getElementById("members")
+          .textContent =
+          data.members ?? 0;
+
+
+        // Server icon
+        if (data.icon) {
+
+          document.getElementById("icon").src =
+            `https://cdn.discordapp.com/icons/399904586824941568/${data.icon}.png?size=256`;
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Could not update Discord stats:",
+          error
+        );
+
+      }
+
     }
+
+
+    // Load stats immediately
+    updateStats();
+
+
+    // Refresh every 60 seconds
+    setInterval(
+      updateStats,
+      60000
+    );
+
+  </script>
+
+</body>
+</html>

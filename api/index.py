@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import os
 import requests
 
@@ -8,8 +9,13 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID = "399904586824941568"
 
 
-@app.get("/api")
+@app.get("/")
 def home():
+    return FileResponse("index.html")
+
+
+@app.get("/api")
+def api_home():
     return {
         "status": "online",
         "message": "RAVESZN Discord Card API is working."

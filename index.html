@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RAVESZN CLUB!</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -15,82 +16,188 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      background: #11131a;
+      padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(88, 101, 242, 0.25), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(145, 70, 255, 0.2), transparent 45%),
+        #11131a;
     }
 
     .card {
-      width: 360px;
-      padding: 24px;
-      border-radius: 20px;
-      background: rgba(35, 38, 48, 0.95);
+      width: min(100%, 620px);
+      min-height: 190px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
       color: white;
-      text-align: center;
     }
 
     .icon {
-      width: 82px;
-      height: 82px;
-      border-radius: 50%;
-      margin: 0 auto 14px;
+      width: 115px;
+      height: 115px;
+      flex-shrink: 0;
+      border-radius: 25px;
       object-fit: cover;
+      background: #24262d;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    }
+
+    .content {
+      flex: 1;
+      min-width: 0;
     }
 
     h1 {
-      margin: 0 0 10px;
-      font-size: 24px;
+      margin: 0 0 13px;
+      font-size: clamp(25px, 5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
     }
 
     .stats {
-      color: #b5bac1;
-      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 18px;
+      color: rgba(255, 255, 255, 0.78);
       font-size: 15px;
+      font-weight: 600;
+    }
+
+    .online {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .online-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #23a559;
+      box-shadow: 0 0 10px rgba(35, 165, 89, 0.7);
+    }
+
+    .separator {
+      opacity: 0.45;
     }
 
     .join {
-      display: block;
-      padding: 12px;
-      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      padding: 11px 25px;
+      border-radius: 12px;
       background: #5865f2;
       color: white;
       text-decoration: none;
-      font-weight: bold;
+      font-size: 16px;
+      font-weight: 700;
+      transition: 0.2s ease;
+      box-shadow: 0 7px 20px rgba(88, 101, 242, 0.35);
     }
 
     .join:hover {
-      opacity: 0.9;
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .join:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 550px) {
+      .card {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+      }
+
+      .icon {
+        width: 95px;
+        height: 95px;
+      }
+
+      .stats {
+        justify-content: center;
+      }
+
+      .join {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <div class="card">
-    <img id="icon" class="icon" src="" alt="Server Icon">
 
-    <h1 id="name">RAVESZN CLUB!</h1>
+    <img
+      id="icon"
+      class="icon"
+      src=""
+      alt="RAVESZN CLUB! Server Icon"
+    >
 
-    <div class="stats">
-      🟢 <span id="online">--</span> ONLINE
-      •
-      👥 <span id="members">--</span> MEMBERS
+    <div class="content">
+
+      <h1 id="name">RAVESZN CLUB!</h1>
+
+      <div class="stats">
+
+        <span class="online">
+          <span class="online-dot"></span>
+          <span id="online">--</span> ONLINE
+        </span>
+
+        <span class="separator">•</span>
+
+        <span>
+          👥 <span id="members">--</span> MEMBERS
+        </span>
+
+      </div>
+
+      <a
+        class="join"
+        href="https://discord.gg/TvyZ2VjQMg"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        JOIN
+      </a>
+
     </div>
 
-    <a
-      class="join"
-      href="https://discord.gg/TvyZ2VjQMg"
-      target="_blank"
-    >
-      JOIN
-    </a>
   </div>
 
   <script>
     async function updateStats() {
       try {
         const response = await fetch("/api/stats");
+
+        if (!response.ok) {
+          throw new Error("API request failed");
+        }
+
         const data = await response.json();
 
-        if (data.status === "error") return;
+        if (data.status === "error") {
+          return;
+        }
 
         document.getElementById("name").textContent =
           data.name || "RAVESZN CLUB!";
@@ -105,14 +212,18 @@
           document.getElementById("icon").src =
             `https://cdn.discordapp.com/icons/399904586824941568/${data.icon}.png?size=256`;
         }
+
       } catch (error) {
-        console.error(error);
+        console.error("Could not update Discord stats:", error);
       }
     }
 
+    // Load immediately
     updateStats();
 
+    // Update every 60 seconds
     setInterval(updateStats, 60000);
   </script>
+
 </body>
 </html>
